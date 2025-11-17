@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸运数字测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 30px;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .buttons-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .number-btn {
+            background: #ff6b6b;
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            padding: 25px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .number-btn:hover {
+            background: #ff5252;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(255, 107, 107, 0.4);
+        }
+        
+        .number-btn.selected {
+            background: #45b7af;
+            transform: scale(0.95);
+        }
+        
+        .pig-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .pig-image {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 25px;
+            margin: 20px 0;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .pig-text {
+            font-size: 2.5rem;
+            margin: 20px 0;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .extra-text {
+            font-size: 1.8rem;
+            color: #ff6b6b;
+            margin: 15px 0;
+            animation: bounce 1s infinite;
+        }
+        
+        .exit-btn {
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 40px;
+            margin-top: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .exit-btn:hover {
+            background: #ff5252;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 107, 107, 0.4);
+        }
+        
+        .final-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7af, #96ceb4);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            animation: rainbow 2s infinite;
+        }
+        
+        .final-pig {
+            font-size: 40vw;
+            margin: 20px 0;
+            animation: pigBounce 0.5s infinite alternate;
+            filter: drop-shadow(0 0 30px rgba(0,0,0,0.5));
+        }
+        
+        .final-text {
+            font-size: 4rem;
+            margin: 20px 0;
+            color: white;
+            font-weight: bold;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            animation: textShake 0.3s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes rainbow {
+            0% { background: #ff6b6b; }
+            25% { background: #4ecdc4; }
+            50% { background: #45b7af; }
+            75% { background: #96ceb4; }
+            100% { background: #ff6b6b; }
+        }
+        
+        @keyframes pigBounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+        
+        @keyframes textShake {
+            0% { transform: translateX(-2px); }
+            25% { transform: translateX(2px); }
+            50% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+            100% { transform: translateX(-2px); }
+        }
+        
+        /* 手机适配 */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .buttons-container { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .number-btn { font-size: 2rem; padding: 20px 0; }
+            .pig-image { width: 250px; height: 250px; }
+            .pig-text { font-size: 2rem; }
+            .final-text { font-size: 2.5rem; }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .buttons-container { grid-template-columns: repeat(2, 1fr); }
+            .number-btn { font-size: 1.8rem; padding: 18px 0; }
+            .pig-image { width: 200px; height: 200px; }
+            .pig-text { font-size: 1.8rem; }
+            .final-text { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 初始选择页面 -->
+    <div class="container" id="selection-page">
+        <h1>🔮 请选择你的幸运数字 🔮</h1>
+        <div class="buttons-container">
+            <button class="number-btn" data-number="0">0</button>
+            <button class="number-btn" data-number="1">1</button>
+            <button class="number-btn" data-number="2">2</button>
+            <button class="number-btn" data-number="3">3</button>
+            <button class="number-btn" data-number="4">4</button>
+            <button class="number-btn" data-number="5">5</button>
+            <button class="number-btn" data-number="6">6</button>
+            <button class="number-btn" data-number="7">7</button>
+            <button class="number-btn" data-number="8">8</button>
+            <button class="number-btn" data-number="9">9</button>
+        </div>
+    </div>
+    
+    <!-- 猪猪页面 -->
+    <div class="container pig-container" id="pig-page">
+        <img class="pig-image" id="pig-img" alt="真相大白">
+        <div class="pig-text" id="pig-text">猪猪本色</div>
+        <div class="extra-text" id="extra-text"></div>
+        <button class="exit-btn" id="exit-btn">不信邪？再测一次！</button>
+    </div>
+    
+    <!-- 最终霸屏页面 -->
+    <div class="final-overlay" id="final-overlay">
+        <div class="final-pig">🐷</div>
+        <div class="final-text">接受现实吧猪宝宝</div>
+    </div>
+
+    <script>
+        // 纯猪猪表情数组
+        const pigImages = [
+            "🐷", "🐖", "🐽", "🐗", "🐷", 
+            "🐖", "🐽", "🐗", "🐷", "🐖"
+        ];
+        
+        // 损人语录 - 更损更口语化
+        const sarcasticTexts = [
+            "惊不惊喜？你就是猪！",
+            "意不意外？猪猪本色！",
+            "没想到吧？猪性难移！", 
+            "猜猜看？没错，是猪！",
+            "别试了，猪猪附体！",
+            "放弃吧，天命如此！",
+            "猪猪永不为奴！",
+            "你与猪猪有缘！",
+            "猪猪之神眷顾你！",
+            "恭喜觉醒猪猪血脉！"
+        ];
+        
+        // 重复选择的损人语录 - 更损更口语化
+        const repeatTexts = [
+            "咋又回来了？这么想当猪？",
+            "欢迎回来照镜子！", 
+            "猪瘾犯了是吧？",
+            "就知道你舍不得猪猪！",
+            "猪猪的魅力这么大？",
+            "你这是第几次回来了？",
+            "猪猪对你施了魔法？",
+            "又来找虐了是吧？",
+            "猪猪：我就知道你会回来！"
+        ];
+        
+        // 页面元素
+        const selectionPage = document.getElementById('selection-page');
+        const pigPage = document.getElementById('pig-page');
+        const finalOverlay = document.getElementById('final-overlay');
+        const pigImg = document.getElementById('pig-img');
+        const pigText = document.getElementById('pig-text');
+        const extraText = document.getElementById('extra-text');
+        const exitBtn = document.getElementById('exit-btn');
+        
+        // 存储用户选择
+        const selectedNumbers = new Set();
+        const numberButtons = document.querySelectorAll('.number-btn');
+        
+        // 点击计数器
+        let clickCount = 0;
+        const requiredClicks = 10;
+        
+        // 创建猪猪图片
+        function createPigEmoji(emoji, size = 200) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // 设置粉色背景
+            ctx.fillStyle = '#FFD6D6';
+            ctx.fillRect(0, 0, size, size);
+            
+            // 绘制猪猪
+            ctx.font = `${size * 0.8}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emoji, size/2, size/2);
+            
+            return canvas.toDataURL();
+        }
+        
+        // 为每个数字按钮添加点击事件
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const number = parseInt(button.getAttribute('data-number'));
+                showPigPage(number);
+            });
+        });
+        
+        // 显示猪猪页面
+        function showPigPage(number) {
+            // 记录选择的数字
+            const isRepeat = selectedNumbers.has(number);
+            selectedNumbers.add(number);
+            
+            // 标记已选择的按钮
+            numberButtons[number].classList.add('selected');
+            
+            // 设置猪猪图片
+            const pigIndex = number % pigImages.length;
+            pigImg.src = createPigEmoji(pigImages[pigIndex]);
+            
+            // 设置损人文字
+            if (selectedNumbers.size === 1) {
+                pigText.textContent = "猪猪本色";
+            } else {
+                const textIndex = (selectedNumbers.size - 1) % sarcasticTexts.length;
+                pigText.textContent = sarcasticTexts[textIndex];
+            }
+            
+            // 如果是重复选择，显示更损的文字
+            if (isRepeat) {
+                const repeatIndex = number % repeatTexts.length;
+                extraText.textContent = repeatTexts[repeatIndex];
+            } else {
+                extraText.textContent = "";
+            }
+            
+            // 隐藏选择页面，显示猪猪页面
+            selectionPage.style.display = 'none';
+            pigPage.style.display = 'flex';
+            
+            // 检查是否所有数字都被选择过
+            if (selectedNumbers.size === 10) {
+                // 立即显示最终霸屏页面
+                setTimeout(() => {
+                    showFinalOverlay();
+                }, 1000);
+            }
+        }
+        
+        // 显示最终霸屏页面
+        function showFinalOverlay() {
+            pigPage.style.display = 'none';
+            finalOverlay.style.display = 'flex';
+            clickCount = 0;
+            
+            // 添加点击事件监听
+            finalOverlay.addEventListener('click', handleFinalClick);
+        }
+        
+        // 处理最终页面的点击
+        function handleFinalClick() {
+            clickCount++;
+            
+            if (clickCount >= requiredClicks) {
+                // 移除点击监听
+                finalOverlay.removeEventListener('click', handleFinalClick);
+                // 返回选择页面
+                finalOverlay.style.display = 'none';
+                selectionPage.style.display = 'block';
+                
+                // 重置游戏
+                selectedNumbers.clear();
+                numberButtons.forEach(btn => btn.classList.remove('selected'));
+            }
+        }
+        
+        // 返回选择页面
+        exitBtn.addEventListener('click', () => {
+            pigPage.style.display = 'none';
+            selectionPage.style.display = 'block';
+        });
+        
+        // 初始化
+        selectionPage.style.display = 'block';
+        pigPage.style.display = 'none';
+        finalOverlay.style.display = 'none';
+    </script>
+</body>
+</html>
